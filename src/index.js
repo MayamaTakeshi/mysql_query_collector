@@ -4,7 +4,21 @@ var common = require('mysql/test/common')
 
 var deasync = require('deasync')
 
-var send_data_reply = (conn, fields, rows) => {
+var send_error = (conn, errno, message) => {
+	conn._sendPacket(new common.Packets.ErrorPacket({
+		errno   : errno,
+		message : message
+	}));
+
+	conn._parser.resetPacketNumber();
+}
+
+var send_ok = (conn) => {
+		conn._sendPacket(new common.Packets.OkPacket());
+		conn._parser.resetPacketNumber();
+}
+
+var send_dataset = (conn, fields, rows) => {
 		conn._sendPacket(new common.Packets.ResultSetHeaderPacket({
 			fieldCount: fields.length
 		}));
@@ -70,14 +84,21 @@ module.exports = {
 					conn.on('query', function(packet) {
 						var reply = cb_query(conn, connection_name, packet.sql); 
 						if (reply) {
-							send_data_reply(conn, reply.fields, reply.rows)							
+							switch(reply.type) {
+							case "dataset":
+								send_dataset(conn, reply.fields, reply.rows)							
+								break
+							case "ok":
+								send_ok(conn)
+								break
+							case "error":
+								send_error(conn, reply.errno, reply.message)
+								break
+							default:
+								throw `Unsupported reply.type ${reply_type}`
+							}
 						} else {
-							this._sendPacket(new common.Packets.ErrorPacket({
-								errno   : common.Errors.ER_QUERY_INTERRUPTED,
-								message : 'Interrupted unknown query'
-							}));
-
-							this._parser.resetPacketNumber();
+							send_error(conn, common.Errors.ER_QUERY_INTERRUPTED, 'Interrupted unknown query')
 						}
 					});
 				});
