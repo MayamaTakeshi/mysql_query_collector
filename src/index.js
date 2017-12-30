@@ -48,29 +48,29 @@ var send_dataset = (conn, fields, rows) => {
 }
 
 module.exports = {
-	setup: (connections, cb_ready, cb_query) => {
+	setup: (servers, cb_ready, cb_query) => {
 
-		for(var key in connections) {
-			var server = new FakeServer()
+		servers.forEach((server) =>  {
+			var s = new FakeServer()
 
 			var done = false;
-			var host_port = connections[key];
+			var host_port = server.address;
 			var port = parseInt(host_port.split(":")[1]);
 
 			(() => {
 				var p = port
-				var connection_name = key
-				server.listen(p, function (err) {
+				var server_name = server.name 
+				s.listen(p, function (err) {
 					if(err) {
 						throw err
 					}
-					console.error(`FakeServer ${connection_name} listening port ${p}`) // Not actually an error
+					console.error(`FakeServer ${server_name} listening port ${p}`) // Not actually an error
 					done = true
 				})
 
 				deasync.loopWhile(() => { return !done })
 
-				server.on('connection', function(conn) {
+				s.on('connection', function(conn) {
 					conn.handshake({
 						protocolVersion: 10,
 						serverVersion: "some_version",
@@ -82,7 +82,7 @@ module.exports = {
 					});
 
 					conn.on('query', function(packet) {
-						var reply = cb_query(conn, connection_name, packet.sql); 
+						var reply = cb_query(conn, server_name, packet.sql); 
 						if (reply) {
 							switch(reply.type) {
 							case "dataset":
@@ -103,7 +103,7 @@ module.exports = {
 					});
 				});
 			})()
-		}
+		})
 
 		cb_ready()
 	},
