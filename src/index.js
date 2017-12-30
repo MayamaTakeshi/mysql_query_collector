@@ -54,8 +54,8 @@ module.exports = {
 			var s = new FakeServer()
 
 			var done = false;
-			var host_port = server.address;
-			var port = parseInt(host_port.split(":")[1]);
+			var host = server.host;
+			var port = server.port;
 
 			(() => {
 				var p = port
