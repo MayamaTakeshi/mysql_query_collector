@@ -59,12 +59,11 @@ module.exports = {
 
 			(() => {
 				var p = port
-				var server_name = server.name 
 				s.listen(p, function (err) {
 					if(err) {
 						throw err
 					}
-					console.error(`FakeServer ${server_name} listening port ${p}`) // Not actually an error
+					console.error(`FakeServer ${server.name} listening port ${p}`) // Not actually an error
 					done = true
 				})
 
@@ -82,7 +81,7 @@ module.exports = {
 					});
 
 					conn.on('query', function(packet) {
-						var reply = cb_query(conn, server_name, packet.sql); 
+						var reply = cb_query(conn, server, packet.sql); 
 						if (reply) {
 							switch(reply.type) {
 							case "dataset":
