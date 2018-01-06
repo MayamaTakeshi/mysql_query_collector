@@ -27,7 +27,7 @@ var send_dataset = (conn, fields, rows) => {
 			conn._sendPacket(new common.Packets.FieldPacket({
 				catalog    : 'def',
 				charsetNr  : common.Charsets.UTF8_GENERAL_CI,
-				name       : field.name,
+				name       : field.name ? field.name : field, // field can be just a string with a name like "id" or a dict: {name: "id", type: types.LONG}
 				protocol41 : true,
 				type       : field.type ? field.type : common.Types.VARCHAR
 			}));
