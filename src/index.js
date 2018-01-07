@@ -27,7 +27,7 @@ var send_dataset = (conn, fields, rows) => {
 			conn._sendPacket(new common.Packets.FieldPacket({
 				catalog    : 'def',
 				charsetNr  : common.Charsets.UTF8_GENERAL_CI,
-				name       : field.name,
+				name       : field.name ? field.name : field, // field can be just a string with a name like "id" or a dict: {name: "id", type: types.LONG}
 				protocol41 : true,
 				type       : field.type ? field.type : common.Types.VARCHAR
 			}));
@@ -59,12 +59,11 @@ module.exports = {
 
 			(() => {
 				var p = port
-				var server_name = server.name 
 				s.listen(p, function (err) {
 					if(err) {
 						throw err
 					}
-					console.error(`FakeServer ${server_name} listening port ${p}`) // Not actually an error
+					console.error(`FakeServer ${server.name} listening port ${p}`) // Not actually an error
 					done = true
 				})
 
@@ -82,7 +81,7 @@ module.exports = {
 					});
 
 					conn.on('query', function(packet) {
-						var reply = cb_query(conn, server_name, packet.sql); 
+						var reply = cb_query(conn, server, packet.sql); 
 						if (reply) {
 							switch(reply.type) {
 							case "dataset":
