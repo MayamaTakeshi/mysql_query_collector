@@ -47,6 +47,23 @@ var send_dataset_reply = (conn, fields, rows) => {
 		conn._parser.resetPacketNumber();
 }
 
+var send_reply = (conn, reply) => {
+	switch(reply.type) {
+	case "dataset":
+		send_dataset_reply(conn, reply.fields, reply.rows)							
+		break
+	case "ok":
+		send_ok_reply(conn)
+		break
+	case "error":
+		send_error_reply(conn, reply.errno, reply.message)
+		break
+	default:
+		throw `Unsupported reply.type ${reply_type}`
+	}
+}
+
+
 module.exports = {
 	setup: (servers, cb_ready, cb_query) => {
 
@@ -83,19 +100,7 @@ module.exports = {
 					conn.on('query', function(packet) {
 						var reply = cb_query(conn, server, packet.sql); 
 						if (reply) {
-							switch(reply.type) {
-							case "dataset":
-								send_dataset_reply(conn, reply.fields, reply.rows)							
-								break
-							case "ok":
-								send_ok_reply(conn)
-								break
-							case "error":
-								send_error_reply(conn, reply.errno, reply.message)
-								break
-							default:
-								throw `Unsupported reply.type ${reply_type}`
-							}
+							send_reply(conn, reply)
 						}
 					});
 				});
@@ -105,10 +110,6 @@ module.exports = {
 		cb_ready()
 	},
 
-	send_ok_reply: send_ok_reply,
-	
-	send_error_reply: send_error_reply,
-
-	send_dataset_reply: send_dataset_reply,
+	send_reply: send_reply,
 }
 
