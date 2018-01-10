@@ -4,7 +4,12 @@ var common = require('mysql/test/common')
 
 var deasync = require('deasync')
 
-var send_error = (conn, errno, message) => {
+var send_ok_reply = (conn) => {
+		conn._sendPacket(new common.Packets.OkPacket());
+		conn._parser.resetPacketNumber();
+}
+
+var send_error_reply = (conn, errno, message) => {
 	conn._sendPacket(new common.Packets.ErrorPacket({
 		errno   : errno,
 		message : message
@@ -13,12 +18,7 @@ var send_error = (conn, errno, message) => {
 	conn._parser.resetPacketNumber();
 }
 
-var send_ok = (conn) => {
-		conn._sendPacket(new common.Packets.OkPacket());
-		conn._parser.resetPacketNumber();
-}
-
-var send_dataset = (conn, fields, rows) => {
+var send_dataset_reply = (conn, fields, rows) => {
 		conn._sendPacket(new common.Packets.ResultSetHeaderPacket({
 			fieldCount: fields.length
 		}));
@@ -85,19 +85,17 @@ module.exports = {
 						if (reply) {
 							switch(reply.type) {
 							case "dataset":
-								send_dataset(conn, reply.fields, reply.rows)							
+								send_dataset_reply(conn, reply.fields, reply.rows)							
 								break
 							case "ok":
-								send_ok(conn)
+								send_ok_reply(conn)
 								break
 							case "error":
-								send_error(conn, reply.errno, reply.message)
+								send_error_reply(conn, reply.errno, reply.message)
 								break
 							default:
 								throw `Unsupported reply.type ${reply_type}`
 							}
-						} else {
-							send_error(conn, common.Errors.ER_QUERY_INTERRUPTED, 'Interrupted unknown query')
 						}
 					});
 				});
@@ -106,5 +104,11 @@ module.exports = {
 
 		cb_ready()
 	},
+
+	send_ok_reply: send_ok_reply,
+	
+	send_error_reply: send_error_reply,
+
+	send_dataset_reply: send_dataset_reply,
 }
 
