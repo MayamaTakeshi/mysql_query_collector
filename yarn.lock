@@ -29,9 +29,9 @@ isarray@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/isarray/-/isarray-1.0.0.tgz#bb935d48582cba168c06834957a54a3e07124f11"
 
-"mysql@https://github.com/mysqljs/mysql#v2.15.0":
+"mysql@https://github.com/MayamaTakeshi/mysql":
   version "2.15.0"
-  resolved "https://github.com/mysqljs/mysql#e16c52da980e46012a391232be884b797b8af070"
+  resolved "https://github.com/MayamaTakeshi/mysql#46be119f25c77fb0c49ae11f103bcc891d7726a8"
   dependencies:
     bignumber.js "4.0.4"
     readable-stream "2.3.3"
