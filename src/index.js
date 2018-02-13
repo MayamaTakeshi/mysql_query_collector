@@ -59,7 +59,7 @@ var send_reply = (conn, reply) => {
 		send_error_reply(conn, reply.errno, reply.message)
 		break
 	default:
-		throw `Unsupported reply.type ${reply_type}`
+		throw `Unsupported reply.type ${reply.type}`
 	}
 }
 
