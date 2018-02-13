@@ -66,7 +66,6 @@ var send_reply = (conn, reply) => {
 
 module.exports = {
 	setup: (servers, cb_ready, cb_query, cb_init_db) => {
-
 		servers.forEach((server) =>  {
 			var s = new FakeServer()
 
@@ -98,18 +97,20 @@ module.exports = {
 					});
 
 					conn.on('query', function(packet) {
-						var reply = cb_query(conn, server, packet.sql); 
+						var reply = cb_query(conn, server, packet.sql);
 						if (reply) {
 							send_reply(conn, reply)
 						}
 					});
 
-					conn.on('init_db', function(packet) {
-						var reply = cb_init_db(conn, server, packet.sql); 
-						if (reply) {
-							send_reply(conn, reply)
-						}
-					});
+					if(cb_init_db) {
+						conn.on('init_db', function(packet) {
+							var reply = cb_init_db(conn, server, packet.database_name);
+							if (reply) {
+								send_reply(conn, reply)
+							}
+						});
+					}
 				});
 			})()
 		})
