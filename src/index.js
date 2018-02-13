@@ -105,9 +105,13 @@ module.exports = {
 					});
 
 					conn.on('init_db', function(packet) {
-						var reply = cb_init_db(conn, server, packet.sql); 
-						if (reply) {
-							send_reply(conn, reply)
+						if(cb_init_db) {
+							var reply = cb_init_db(conn, server, packet.database_name); 
+							if (reply) {
+								send_reply(conn, reply)
+							}
+						} else {
+							send_reply(conn, {type: 'ok'})
 						}
 					});
 				});
