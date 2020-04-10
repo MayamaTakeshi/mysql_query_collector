@@ -1,6 +1,6 @@
 {
   "name": "mysql_query_collector",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "",
   "main": "src/index.js",
   "scripts": {
@@ -9,7 +9,7 @@
   "author": "MayamaTakeshi <mayamatakeshi@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "deasync": "^0.1.12",
-    "mysql": "https://github.com/MayamaTakeshi/mysql"
+    "deasync": "^0.1.19",
+    "mysql": "^2.18.1"
   }
 }
