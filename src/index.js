@@ -1,5 +1,5 @@
 
-var FakeServer = require('mysql/test/FakeServer.js')
+var FakeServer = require('mysql/test/FakeServer')
 var common = require('mysql/test/common')
 
 var deasync = require('deasync')
