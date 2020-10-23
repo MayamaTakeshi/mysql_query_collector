@@ -35,13 +35,15 @@ var send_dataset_reply = (conn, fields, rows) => {
 
 		conn._sendPacket(new common.Packets.EofPacket());
 
-		rows.forEach((row) => {
-			var writer = new common.PacketWriter();
-			row.forEach((value) => {
-				writer.writeLengthCodedString(value);
+		if(rows) {
+			rows.forEach((row) => {
+				var writer = new common.PacketWriter();
+				row.forEach((value) => {
+					writer.writeLengthCodedString(value);
+				})
+				conn._socket.write(writer.toBuffer(conn._parser));
 			})
-			conn._socket.write(writer.toBuffer(conn._parser));
-		})
+		}
 
 		conn._sendPacket(new common.Packets.EofPacket());
 		conn._parser.resetPacketNumber();
