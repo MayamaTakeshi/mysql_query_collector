@@ -54,7 +54,7 @@ connection.connect()
 
 connection.query(QUERY, function (error, results, fields) {
 	if (error) throw error
-	console.log(`The client received: ${results[0].solution}`)
+	console.log(`The client received: ${JSON.stringify(results)}`)
 	process.exit(0)
 })
 
